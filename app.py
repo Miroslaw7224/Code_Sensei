@@ -202,6 +202,9 @@ st.sidebar.markdown("---")
 st.sidebar.warning(
     "🔐 Twój klucz jest przechowywany tylko w tej sesji."
 )
+# Nowa sekcja linku do GitHuba
+st.sidebar.markdown("---")
+st.sidebar.markdown("🔗 **[Kod źródłowy na GitHubie](https://github.com/Miroslaw7224/Code_Sensei)**")
 st.sidebar.info("""
 **ℹ️ Code Sensei**
 
