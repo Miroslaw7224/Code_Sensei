@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Sensei — wejście do aplikacji</title>
+  <meta name="description" content="Code Sensei — analiza kodu z OpenAI. Przejdź do aplikacji Streamlit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e1117;
+      --bg-elevated: #161b22;
+      --surface: #262730;
+      --surface-hover: #2e333d;
+      --border: #3d404a;
+      --text: #fafafa;
+      --text-muted: #a3a8b8;
+      --accent: #ff4b4b;
+      --accent-hover: #ff6b6b;
+      --info: #1c83e1;
+      --warning-bg: rgba(255, 193, 7, 0.12);
+      --warning-border: rgba(255, 193, 7, 0.35);
+      --radius: 0.75rem;
+      --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* subtelna siatka jak w UI analitycznym */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow {
+      position: fixed;
+      width: 70vmax;
+      height: 70vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 75, 75, 0.08) 0%, transparent 55%);
+      top: -20%;
+      right: -15%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+    }
+
+    .brand h1 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand span {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .hero-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) + 4px);
+      padding: clamp(1.5rem, 4vw, 2rem);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-card p.lead {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 52ch;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.75rem 1.35rem;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 75, 75, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 75, 75, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      width: 100%;
+    }
+
+    .hint code {
+      background: var(--surface);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      border: 1px solid var(--border);
+    }
+
+    .notice {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius);
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      font-size: 0.88rem;
+      color: #e8d4a8;
+      margin-top: 1rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .feature:hover {
+      border-color: rgba(255, 75, 75, 0.35);
+      background: var(--surface-hover);
+    }
+
+    .feature strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .feature span {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--info);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="glow" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="brand">
+      <div class="brand-icon" aria-hidden="true">🧠</div>
+      <div>
+        <h1>Code Sensei</h1>
+        <span>Analizuj kod krok po kroku — ten sam styl co aplikacja Streamlit</span>
+      </div>
+    </header>
+
+    <section class="hero-card" aria-label="Wprowadzenie">
+      <p class="lead">
+        Ta strona jest punktem wejścia. Zanim przejdziesz dalej, upewnij się, że aplikacja jest uruchomiona lokalnie
+        (<code style="background:var(--surface);padding:0.2rem 0.45rem;border-radius:4px;border:1px solid var(--border);font-size:0.85em;">streamlit run app.py</code>
+        z katalogu projektu).
+      </p>
+
+      <div class="cta-row">
+        <a id="app-link" class="btn btn-primary" href="http://localhost:8501">Otwórz aplikację →</a>
+        <a class="btn btn-secondary" href="https://github.com/Miroslaw7224/Code_Sensei" target="_blank" rel="noopener noreferrer">Kod na GitHubie</a>
+      </div>
+      <p class="hint">
+        Adres aplikacji możesz zmienić w tym pliku: zmienna <code>window.__APP_URL__</code> w skrypcie na dole strony (np. na URL wdrożenia Streamlit Cloud).
+      </p>
+
+      <div class="notice" role="status">
+        <span aria-hidden="true">🔐</span>
+        <div>
+          Klucz OpenAI wpisujesz dopiero w aplikacji — w panelu bocznym, tylko na czas sesji. Nie zapisuj go na tej stronie statycznej.
+        </div>
+      </div>
+    </section>
+
+    <section class="features" aria-label="Funkcje aplikacji">
+      <article class="feature">
+        <strong>🔍 Analizuj kod</strong>
+        <span>Opisy, audio TTS, pytania i refaktoryzacja</span>
+      </article>
+      <article class="feature">
+        <strong>📜 Historia</strong>
+        <span>Filtry, odtwarzanie, eksport CSV</span>
+      </article>
+      <article class="feature">
+        <strong>📊 Statystyki</strong>
+        <span>Podsumowanie kosztów i eksport danych</span>
+      </article>
+      <article class="feature">
+        <strong>🧩 Tryb demo</strong>
+        <span>Podgląd UI bez klucza API</span>
+      </article>
+    </section>
+
+    <footer>
+      <span>Miro7224 · Code Sensei</span>
+      <a href="mailto:miro7224.job@gmail.com">Kontakt</a>
+    </footer>
+  </div>
+
+  <script>
+    /* Zmień tutaj URL po wdrożeniu (np. Streamlit Cloud). */
+    window.__APP_URL__ = "http://localhost:8501";
+
+    (function () {
+      var link = document.getElementById("app-link");
+      if (link && window.__APP_URL__) {
+        link.href = window.__APP_URL__;
+      }
+    })();
+  </script>
+</body>
+</html>

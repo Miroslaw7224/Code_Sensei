@@ -7,6 +7,7 @@ from datetime import datetime
 import pandas as pd
 import io
 import os
+from pathlib import Path
 
 def set_custom_style():
     st.markdown("""
@@ -178,6 +179,191 @@ st.set_page_config(
 )
 # ✨ Wywołaj funkcję stylów
 set_custom_style()
+
+
+def render_landing_page():
+    """Pierwszy ekran — ten sam klimat co statyczny landing (ciemny / akcent Streamlit)."""
+    st.markdown(
+        """
+        <style>
+            .stApp, [data-testid="stAppViewContainer"] {
+                background-color: #0e1117 !important;
+            }
+            section.main, section.main > div {
+                color: #e8eaed !important;
+            }
+            [data-testid="stSidebar"] { display: none !important; }
+            [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+            div[data-testid="stToolbar"] { display: none !important; }
+            .block-container {
+                padding-top: 2rem !important;
+                max-width: 920px !important;
+            }
+            .lp-bg {
+                position: fixed; inset: 0; z-index: -1;
+                background: #0e1117;
+                background-image:
+                  linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+                background-size: 48px 48px;
+            }
+            .lp-glow {
+                position: fixed; width: 70vmax; height: 70vmax; border-radius: 50%;
+                background: radial-gradient(circle, rgba(255,75,75,0.08) 0%, transparent 55%);
+                top: -20%; right: -15%; z-index: -1; pointer-events: none;
+            }
+            .lp-hero h1 { font-size: 2rem; font-weight: 700; margin: 0 0 0.5rem 0; color: #fafafa; }
+            .lp-hero p { color: #a3a8b8; font-size: 1.05rem; line-height: 1.55; max-width: 52ch; }
+            .lp-card {
+                background: #161b22; border: 1px solid #3d404a; border-radius: 12px;
+                padding: 1.5rem; margin: 1.25rem 0;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+                color: #e8eaed;
+            }
+            .lp-card p { color: #a3a8b8; margin: 0 0 0.75rem 0; }
+            .lp-section-title {
+                color: #fafafa; font-size: 1.35rem; font-weight: 600;
+                margin: 1.75rem 0 0.75rem 0; letter-spacing: -0.02em;
+            }
+            .lp-feats {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1rem;
+                margin: 0.5rem 0 1rem 0;
+            }
+            .lp-feat {
+                background: #262730; border: 1px solid #3d404a;
+                border-radius: 10px; padding: 1rem 1.15rem; font-size: 0.9rem;
+            }
+            .lp-feat strong { color: #fafafa; display: block; margin-bottom: 0.4rem; font-size: 0.95rem; }
+            .lp-feat span { color: #a3a8b8; font-size: 0.86rem; line-height: 1.5; display: block; }
+            div[data-testid="stImage"] {
+                overflow: hidden !important;
+                border-radius: 12px !important;
+                border: 1px solid #3d404a !important;
+                margin-bottom: 0.35rem !important;
+            }
+            div[data-testid="stImage"] > img,
+            div[data-testid="stImage"] picture img {
+                border-radius: 0 !important;
+                border: none !important;
+                display: block !important;
+                transform: scale(1.32) !important;
+                transform-origin: center 20% !important;
+            }
+        </style>
+        <div class="lp-bg"></div><div class="lp-glow"></div>
+        <div class="lp-hero">
+            <p style="font-size:1.5rem;margin-bottom:0.25rem;">🧠</p>
+            <h1>Code Sensei</h1>
+            <p><strong style="color:#e8eaed;">Wklejasz kod — dostajesz zrozumiałe wyjaśnienia, audio i odpowiedzi na pytania,</strong>
+            dzięki modelom OpenAI (GPT-4o / GPT-4o-mini). Dla osób uczących się programowania, po przejściu przez cudzy
+            fragment lub własny „klocek”, którego sens chcesz szybko ogarnąć.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    _root = Path(__file__).resolve().parent
+    _demo1 = _root / "demo-1.png"
+    _demo2 = _root / "demo-2.png"
+    _hero_png = _root / "assets" / "hero.png"
+    _has1, _has2 = _demo1.is_file(), _demo2.is_file()
+
+    if _has1 and _has2:
+        c_a, c_b = st.columns(2, gap="medium")
+        with c_a:
+            st.image(
+                str(_demo2),
+                use_container_width=True,
+                caption="Demo — przykładowy opis szczegółowy (`demo-2.png`).",
+            )
+        with c_b:
+            st.image(
+                str(_demo1),
+                use_container_width=True,
+                caption="Demo — widok z kodem w aplikacji (`demo-1.png`).",
+            )
+    elif _has1:
+        st.image(
+            str(_demo1),
+            use_container_width=True,
+            caption="Demo — `demo-1.png` (dodaj `demo-2.png` obok, aby pokazać dwa zrzuty w jednym rzędzie).",
+        )
+    elif _has2:
+        st.image(
+            str(_demo2),
+            use_container_width=True,
+            caption="Demo — `demo-2.png`.",
+        )
+    elif _hero_png.is_file():
+        st.image(
+            str(_hero_png),
+            use_container_width=True,
+            caption="Podgląd interfejsu — placeholder `assets/hero.png` (opcjonalnie użyj `demo-1.png` / `demo-2.png` w katalogu projektu).",
+        )
+    else:
+        st.markdown(
+            """
+            <div style="min-height:200px;border:2px dashed #3d404a;border-radius:12px;
+            display:flex;align-items:center;justify-content:center;color:#a3a8b8;background:#161b22;
+            margin:1rem 0;text-align:center;padding:1rem;">
+            Brak obrazów: umieść w katalogu projektu <code style="color:#fafafa;">demo-1.png</code> i/lub
+            <code style="color:#fafafa;">demo-2.png</code>, albo <code style="color:#fafafa;">assets/hero.png</code>.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    st.markdown(
+        """
+        <div class="lp-card">
+            <p>Poniżej masz <strong>skrót możliwości</strong>. Po kliknięciu „Otwórz aplikację” przejdziesz do pełnego
+            Streamlita: wybór widoku (analiza, historia, statystyki), wklejanie kodu, generowanie treści przez API
+            oraz <strong>tryb demonstracyjny</strong> — możesz przejrzeć cały interfejs bez klucza; działania AI włączą się
+            dopiero po wpisaniu klucza w panelu bocznym.</p>
+            <p style="border-left:3px solid #ffc107;padding-left:0.75rem;margin:0;color:#e8d4a8;">
+            🔐 Klucz OpenAI nigdy nie trafia do repozytorium — podajesz go tylko w aplikacji i trzyma się w sesji do
+            odświeżenia karty.</p>
+        </div>
+        <h2 class="lp-section-title">Kluczowe funkcje</h2>
+        <div class="lp-feats">
+            <div class="lp-feat"><strong>🔍 Analiza kodu (GPT)</strong><span>Model czyta Twój kod i tworzy
+            <strong>opis ogólny</strong> (jedno zdanie) albo <strong>opis szczegółowy</strong> — blok po bloku albo
+            linia po linii, po polsku lub po angielsku. Możesz też podejrzeć kod sformatowany w podglądzie.</span></div>
+            <div class="lp-feat"><strong>🎧 Audio z opisów (TTS)</strong><span>Z wygenerowanego tekstu powstaje
+            nagranie głosowe (OpenAI TTS) — wybór głosu (alloy, nova, shimmer), odtwarzanie w przeglądarce; przy
+            analizach zapisuje się też ścieżka do pliku w historii.</span></div>
+            <div class="lp-feat"><strong>💬 Pytania i odpowiedzi</strong><span>Zadajesz pytanie w kontekście wklejonego
+            kodu (np. „co robi ta pętla?”) — model odpowiada jak mentor. Wpis trafia do osobnej historii z szacunkiem
+            kosztu.</span></div>
+            <div class="lp-feat"><strong>🛠️ Refaktoryzacja</strong><span>Propozycja czytelniejszej wersji kodu plus
+            krótki komentarz, co się zmieniło — przydatne przy porządkowaniu szkiców i uczeniu się dobrych praktyk.</span></div>
+            <div class="lp-feat"><strong>📜 Historia i eksport</strong><span>Wszystkie opisy, pytania i refaktoryzacje
+            lądują w <strong>SQLite</strong>: przegląd, filtry (typ, głos, koszt), usuwanie z archiwizacją kosztów,
+            pobieranie audio oraz <strong>eksport do CSV</strong>.</span></div>
+            <div class="lp-feat"><strong>📊 Koszty i statystyki</strong><span>Po operacjach widać szacunek w PLN
+            (tokeny / długość wg uproszczonego przelicznika w aplikacji). Zbiorcze podsumowania i pełny eksport danych
+            z bazy w jednym miejscu.</span></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.caption(
+        "Bez tego ekranu: dodaj do adresu parametr `?app=1` (np. zakładka z bezpośrednim linkiem do narzędzia)."
+    )
+
+
+# Pierwszy ekran: landing w Streamlit (jedno `streamlit run app.py`)
+_app_qp = st.query_params.get("app")
+if _app_qp is not None and (str(_app_qp[0]) if isinstance(_app_qp, (list, tuple)) else str(_app_qp)) == "1":
+    st.session_state["entered_main_app"] = True
+if not st.session_state.get("entered_main_app", False):
+    render_landing_page()
+    if st.button("Otwórz aplikację →", type="primary", use_container_width=True):
+        st.session_state["entered_main_app"] = True
+        st.rerun()
+    st.stop()
+
 # Sidebar
 st.sidebar.title("🧭 Code Sensei")
 menu = st.sidebar.radio(
@@ -214,15 +400,24 @@ st.sidebar.info("""
 
 Dziękujemy za korzystanie z aplikacji!
 """)
+
+
+def has_openai_key():
+    k = st.session_state.get("user_api_key")
+    return bool(k and str(k).strip())
+
+
 # 🔍 Widok: Analizuj kod
 def view_analyze():
-    # Sprawdzenie, czy klucz jest w sesji
-    if "user_api_key" not in st.session_state:
-        st.error("❌ Nie podano klucza OpenAI. Wprowadź go w panelu bocznym.")
-        st.stop()
-    # ✨ Inicjalizacja klienta
-    client = OpenAI(api_key=st.session_state["user_api_key"])
-    # Inicjalizacja klienta z kluczem użytkownika
+    demo = not has_openai_key()
+    if demo:
+        st.info(
+            "🔍 **Tryb demonstracyjny** — możesz przeglądać interfejs (listy, pola tekstowe, rozwijane sekcje). "
+            "Przyciski korzystające z OpenAI są nieaktywne. Wprowadź klucz API w panelu bocznym, aby włączyć pełną funkcjonalność."
+        )
+    else:
+        client = OpenAI(api_key=st.session_state["user_api_key"])
+
     st.markdown("## 🧠 Code Sensei – Analizuj kod krok po kroku")
 
     # Wybór modelu
@@ -284,7 +479,7 @@ def view_analyze():
     # Kolumna 1: Opis ogólny
     with col1:
         st.markdown("#### 🟢 Opis ogólny")
-        if st.button("✅ Generuj opis ogólny"):
+        if st.button("✅ Generuj opis ogólny", disabled=demo):
             if code_input.strip() == "":
                 st.warning("⚠️ Najpierw wklej kod.")
             else:
@@ -331,13 +526,16 @@ def view_analyze():
         if st.session_state["last_explanation_general"]:
             with st.expander("🔍 Podgląd opisu ogólnego", expanded=True):
                 st.write(st.session_state["last_explanation_general"])
+        elif demo:
+            with st.expander("🔍 Podgląd opisu ogólnego", expanded=False):
+                st.caption("Po wygenerowaniu opisu (z kluczem API) treść pojawi się w tej sekcji.")
 
         voice1 = st.selectbox(
             "🎤 Wybierz głos do nagrania:",
             ["alloy", "nova", "shimmer"],
             key="voice_general"
         )
-        if st.button("🎧 Generuj audio opisu ogólnego"):
+        if st.button("🎧 Generuj audio opisu ogólnego", disabled=demo):
             if not st.session_state["last_explanation_general"]:
                 st.warning("⚠️ Najpierw wygeneruj opis.")
             else:
@@ -376,7 +574,7 @@ def view_analyze():
             ["Opis blokowy", "Opis liniowy"],
             help="Wybierz, czy opis ma być blokowy czy linia po linii."
         )
-        if st.button("✅ Generuj opis szczegółowy"):
+        if st.button("✅ Generuj opis szczegółowy", disabled=demo):
             if code_input.strip() == "":
                 st.warning("⚠️ Najpierw wklej kod.")
             else:
@@ -447,13 +645,16 @@ def view_analyze():
         if st.session_state["last_explanation_detail"]:
             with st.expander("🔍 Podgląd opisu szczegółowego", expanded=True):
                 st.write(st.session_state["last_explanation_detail"])
+        elif demo:
+            with st.expander("🔍 Podgląd opisu szczegółowego", expanded=False):
+                st.caption("Po wygenerowaniu opisu szczegółowego (z kluczem API) treść pojawi się tutaj.")
 
         voice2 = st.selectbox(
             "🎤 Wybierz głos do nagrania:",
             ["alloy", "nova", "shimmer"],
             key="voice_detail"
         )
-        if st.button("🎧 Generuj audio opisu szczegółowego"):
+        if st.button("🎧 Generuj audio opisu szczegółowego", disabled=demo):
             if not st.session_state["last_explanation_detail"]:
                 st.warning("⚠️ Najpierw wygeneruj opis.")
             else:
@@ -500,7 +701,7 @@ def view_analyze():
     )
     st.session_state["qa_question"] = question
 
-    if st.button("💬 Odpowiedz na pytanie"):
+    if st.button("💬 Odpowiedz na pytanie", disabled=demo):
         if code_input.strip() == "":
             st.warning("⚠️ Najpierw wklej kod.")
         elif question.strip() == "":
@@ -542,6 +743,9 @@ def view_analyze():
     if st.session_state["qa_answer"]:
         with st.expander("📖 Odpowiedź", expanded=True):
             st.write(st.session_state["qa_answer"])
+    elif demo:
+        with st.expander("📖 Odpowiedź", expanded=False):
+            st.caption("Tutaj pojawi się odpowiedź modelu na Twoje pytanie o kod.")
     st.divider()
     st.markdown("### 🛠️ Refaktoryzacja kodu")
 
@@ -551,7 +755,7 @@ def view_analyze():
     if "refactor_comment" not in st.session_state:
         st.session_state["refactor_comment"] = ""
 
-    if st.button("🔄 Refaktoryzuj kod"):
+    if st.button("🔄 Refaktoryzuj kod", disabled=demo):
         if code_input.strip() == "":
             st.warning("⚠️ Najpierw wklej kod.")
         else:
@@ -618,17 +822,18 @@ def view_analyze():
             st.markdown("**🔄 Kod po refaktoryzacji:**")
             st.code(st.session_state["refactored_code"], language="python")
             st.markdown(f"💡 **Komentarz:** {st.session_state['refactor_comment']}")
+    elif demo:
+        with st.expander("📖 Podgląd refaktoryzacji", expanded=False):
+            st.caption("Po refaktoryzacji zobaczysz tu zaproponowany kod i krótki komentarz zmian.")
 
 # 📜 Widok: Historia
 
 def view_history():
-        # Sprawdzenie, czy klucz jest w sesji
-    if "user_api_key" not in st.session_state:
-        st.error("❌ Nie podano klucza OpenAI. Wprowadź go w panelu bocznym.")
-        st.stop()
-    # ✨ Inicjalizacja klienta
-    client = OpenAI(api_key=st.session_state["user_api_key"])
-    # Inicjalizacja klienta z kluczem użytkownika
+    if not has_openai_key():
+        st.info(
+            "🔍 **Tryb demonstracyjny** — historia i eksport działają na lokalnej bazie; "
+            "klucz OpenAI jest potrzebny tylko do generowania treści w widoku „Analizuj kod”."
+        )
     st.markdown("## 📜 Historia działań")
 
     tabs = st.tabs([
@@ -806,13 +1011,10 @@ def view_history():
 
 # 📊 Widok: Statystyki i eksport
 def view_statistics():
-    # Sprawdzenie, czy klucz jest w sesji
-    if "user_api_key" not in st.session_state:
-        st.error("❌ Nie podano klucza OpenAI. Wprowadź go w panelu bocznym.")
-        st.stop()
-    # ✨ Inicjalizacja klienta
-    client = OpenAI(api_key=st.session_state["user_api_key"])
-    # Inicjalizacja klienta z kluczem użytkownika
+    if not has_openai_key():
+        st.info(
+            "🔍 **Tryb demonstracyjny** — statystyki i eksport opierają się na zapisanych lokalnie danych."
+        )
     st.header("📊 Statystyki i eksport wszystkich działań")
 
     # Statystyki analiz (opisy)
@@ -930,13 +1132,8 @@ def view_statistics():
         mime="text/csv"
     )
 def view_functions():
-    # Sprawdzenie, czy klucz jest w sesji
-    if "user_api_key" not in st.session_state:
-        st.error("❌ Nie podano klucza OpenAI. Wprowadź go w panelu bocznym.")
-        st.stop()
-    # ✨ Inicjalizacja klienta
-    client = OpenAI(api_key=st.session_state["user_api_key"])
-    # Inicjalizacja klienta z kluczem użytkownika
+    if not has_openai_key():
+        st.info("🔍 **Tryb demonstracyjny** — poniżej opis możliwości aplikacji po włączeniu klucza API.")
     st.markdown('<div class="big-title">🧩 Funkcje aplikacji</div>', unsafe_allow_html=True)
 
     st.markdown("""
