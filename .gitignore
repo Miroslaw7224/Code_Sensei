@@ -1,1 +1,8 @@
 .env
+
+# Python — wygenerowane przy uruchomieniu, nie źródła
+__pycache__/
+*.py[cod]
+*$py.class
+
+# assets/ zostaje w repo (np. hero.png na landing)
